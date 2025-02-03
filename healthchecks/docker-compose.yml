@@ -1,0 +1,38 @@
+services:
+  healthchecks:
+    image: lscr.io/linuxserver/healthchecks:latest
+    container_name: healthchecks
+    networks:
+      - shared-net
+    environment:
+      - PUID=1000
+      - PGID=1002
+      - TZ=America/Chicago
+      - SITE_ROOT=${SITE_ROOT}
+      - SITE_NAME='Health Checks'
+      - ALLOWED_HOSTS=*
+      - DEBUG=False
+      - SUPERUSER_EMAIL=${SUPERUSER_EMAIL}
+      - SUPERUSER_PASSWORD=${SUPERUSER_PSSWD}
+      - DEFAULT_FROM_EMAIL= ${FROM_EMAIL}
+      - EMAIL_HOST= ${EMAIL_HOST}
+      - EMAIL_PORT= ${EMAIL_PORT}
+      - EMAIL_HOST_USER= ${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD= ${EMAIL_HOST_PSSWD}
+      #- EMAIL_USE_TLS= #optional
+    volumes:
+      - ./config:/config
+    ports:
+      - 8777:8000
+      - 2525:2525 #optional
+    restart: unless-stopped
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8777
+      - swag_url=healthchecks.*
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net

@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+    ds:
+      container_name: deepstack
+      image: deepquestai/deepstack
+      restart: unless-stopped
+      environment:
+        - API-KEY_FILE=/run/secrets/apikey
+        - VISION-FACE=True
+      ports:
+        - 5080:5000
+      secrets:
+        - apikey
+      volumes:
+        - ./datastore:/datastore
+secrets:
+  apikey:
+    file: apikey.txt

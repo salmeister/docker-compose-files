@@ -1,0 +1,24 @@
+services:
+  postfix:
+    container_name: postfix
+    image: boky/postfix
+    restart: unless-stopped
+    #network_mode: host
+    environment:
+      - POSTFIX_myhostname=postfix
+      - RELAYHOST=smtp.gmail.com:587
+      - RELAYHOST_USERNAME=@gmail.com
+      - RELAYHOST_PASSWORD_FILE=/run/secrets/apppwd
+      - ALLOWED_SENDER_DOMAINS=${DOMAINS}
+      - POSTFIX_mynetworks=${NETWORKS}
+      - POSTFIX_smtp_tls_security_level=encrypt
+    ports:
+      - 587:587
+    secrets:
+      - apppwd
+      - email
+secrets:
+  apppwd:
+    file: ./apppwd.txt
+  email:
+    file: ./email.txt

@@ -1,0 +1,56 @@
+services:
+  plex:
+    container_name: plex
+    image: lscr.io/linuxserver/plex:latest
+    labels:
+      - swag=enable
+    networks:
+      - shared-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu, video]
+    environment:
+      - VERSION=docker
+      - TZ=America/Chicago
+      - PUID=1000
+      - PGID=1002
+      - PLEX_CLAIM=/run/secrets/plex_claim
+      - NVIDIA_VISIBLE_DEVICES=all
+    secrets:
+      - plex_claim
+    volumes:
+      - ./config:/config
+      - /etc/resolv.conf:/etc/resolv.conf
+      - ./transcode/temp:/transcode
+      - /nas/tv_content/TV_Shows:/tv_shows
+      - /nas/tv_content/Movies:/movies
+      - /nas/home_content/Videos:/videos
+      - /nas/home_content/Pictures:/pictures
+      - /nas/home_content/Music:/music
+      - /nas/tv_content/Workouts:/workouts
+      - /nas/tv_content/Recorded_TV:/recorded_tv
+      - /nas/tv_content/Meditation:/meditation
+    ports:
+      - "32400:32400/tcp"  # Plex default HTTP port
+      - "3005:3005/tcp"    # For older clients
+      - "8324:8324/tcp"    # Resource monitoring and control
+      - "32469:32469/tcp"  # For accessing the Plex DLNA Server
+      - "1900:1900/udp"    # DLNA discovery
+      - "32410:32410/udp"  # GDM (Good Day Mate) network discovery
+      - "32412:32412/udp"  # GDM (Good Day Mate) network discovery
+      - "32413:32413/udp"  # GDM (Good Day Mate) network discovery
+      - "32414:32414/udp"  # GDM (Good Day Mate) network discovery
+    restart: unless-stopped
+
+secrets:
+  plex_claim:
+    file: plex_claim.txt
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net

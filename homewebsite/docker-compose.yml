@@ -1,0 +1,18 @@
+services:
+    home-website:
+        image: ghcr.io/salmeister/salmeister/home-website/homesite:latest
+        container_name: home-website
+        ports:
+          - 8700:80
+        restart: unless-stopped
+        networks:
+          - shared-net
+        labels:
+          - swag=enable
+          - swag_address=${SWAG_ADDRESS}
+          - swag_port=8700
+          - swag_url=home.*
+networks:
+  shared-net:
+    external: true
+    name: shared-net
