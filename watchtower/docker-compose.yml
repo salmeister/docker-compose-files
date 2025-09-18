@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/config.json:/config.json
     environment:
       WATCHTOWER_SCHEDULE: 0 0 9 * * FRI
       WATCHTOWER_NOTIFICATIONS: email

@@ -1,0 +1,41 @@
+services:
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    networks:
+      - shared-net
+    restart: unless-stopped
+    volumes:
+    - ./data:/data
+    - ./logs:/logs
+    environment:
+      - SIGNUPS_ALLOWED=false
+      - PUID=1000
+      - PGID=1002
+      - TZ=America/Chicago
+      - WEBSOCKET_ENABLED=true
+      - DOMAIN=${DOMAIN}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - LOG_FILE=/logs/vaultwarden.log
+      - LOG_LEVEL=warn
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_FROM=${FROM_EMAIL}
+      - SMTP_FROM_NAME=${FROM_NAME}
+      - SMTP_SECURITY=starttls
+      - SMTP_PORT=587
+      - SMTP_USERNAME=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PSSWD}
+      - SMTP_TIMEOUT=30
+    ports:
+    - 480:80
+    healthcheck:
+      disable: true
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=480
+      - swag_url=${SWAG_URL}
+networks:
+  shared-net:
+    external: true
+    name: shared-net

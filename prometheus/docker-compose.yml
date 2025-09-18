@@ -1,0 +1,62 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus-data:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - '9090:9090'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    labels:
+      - swag=enable
+      - swag_url=status.*
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=3333
+    depends_on:
+      - prometheus
+    ports:
+      - '3333:3000'
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN}
+    user: "1000:1000"
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    ports:
+      - '9100:9100'
+    restart: unless-stopped
+
+  nvidia-dcgm-exporter:
+    image: nvidia/dcgm-exporter:latest
+    container_name: nvidia_dcgm_exporter
+    cap_add:
+      - SYS_ADMIN
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    #environment:
+    #  - DCGM_EXPORTER_COLLECTORS=/etc/dcgm-exporter/custom-dcgm-metrics.csv
+    #volumes:
+    #  - ./dcgm-exporter:/etc/dcgm-exporter
+    devices:
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev/nvidia0:/dev/nvidia0 # Add all the GPUs you have
+    ports:
+      - '9400:9400'
+    restart: unless-stopped

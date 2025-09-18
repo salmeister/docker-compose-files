@@ -1,0 +1,81 @@
+services:
+  db:
+    image: ghcr.io/salmeister/self-discipline-db:stage
+    container_name: self-discipline-db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shared-net
+    restart: unless-stopped
+
+  api:
+    image: ghcr.io/salmeister/self-discipline-api:stage
+    container_name: self-discipline-api
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=32769
+      - swag_url=selfdisciplineapi.*
+    ports:
+      - "32769:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - Application__Domain=${APPLICATION_DOMAIN}
+      - StripeSettings__SecretKey=${STRIPE_SECRET_KEY}
+      - StripeSettings__PublishableKey=${STRIPE_PUBLISHABLE_KEY}
+      - JWTSettings__SecretKey=${JWT_SECRET}
+      - JWTSettings__Issuer=${JWT_ISSUER}
+      - JWTSettings__Audience=${JWT_AUDIENCE}
+      - GoogleAuth__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - GoogleAuth__ClientId=${GOOGLE_CLIENT_ID}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - TurnstileSettings__SecretKey=${TURNSTILE_SECRET_KEY}
+      - EmailSettings__SendGridApiKey=${SENDGRID_APIKEY}
+      - Email_Settings__FromEmail=${FROM_EMAIL}
+      - Email_Settings__FromName=${FROM_NAME}
+      - Email_Settings__AdminEmail${ADMIN_EMAIL}
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - shared-net
+
+  ui:
+    image: ghcr.io/salmeister/self-discipline-ui:stage
+    container_name: self-discipline-ui
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=9999
+      - swag_url=selfdiscipline.*
+    ports:
+      - "9999:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+      - VITE_JWT_ISSUER=${VITE_JWT_ISSUER}
+      - VITE_JWT_AUDIENCE=${VITE_JWT_AUDIENCE}
+      - VITE_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+    depends_on:
+      - api
+    networks:
+      - shared-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
+
+x-registry-auth: &registry-auth
+  username: ${GITHUB_USERNAME}
+  password: ${GITHUB_TOKEN}
