@@ -34,7 +34,7 @@ services:
     expose:
       - "5601"
     environment:
-      OPENSEARCH_HOSTS: '["https://opensearchnode.salmeister.com"]'
+      OPENSEARCH_HOSTS: ${OPENSEARCH_HOSTS}
     networks:
       - shared-net
     depends_on:

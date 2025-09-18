@@ -5,3 +5,4 @@
 !**/*.sh
 !/*.gitignore
 !**/README.md
+**/homeassistant/ha/config/
