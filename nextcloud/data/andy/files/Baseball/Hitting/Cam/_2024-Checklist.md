@@ -1,5 +1,0 @@
-- Firm front side
-- Closed front foot at contact
-- Strong top hand and extend through ball
-- Loose and relaxed
-- Envision success
