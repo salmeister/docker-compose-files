@@ -1,7 +1,0 @@
-- Firmed front side at contact
-- Extend top hand through the ball (no rolling over)
-- Less negative movement during the load
-- Hands close to back shoulder at ready-to-hit time
-- Loose and relaxed
-- Envision success
-- Positive internal voice
