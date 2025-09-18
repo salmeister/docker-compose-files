@@ -10,36 +10,10 @@ This homelab setup uses Docker containers orchestrated through Docker Compose to
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Ubuntu Server (tested on 20.04/22.04)
+- Ubuntu Server (24.04)
 - Docker and Docker Compose
 - Domain name with DNS pointing to your server
 - Basic understanding of Docker networking
-
-### Initial Setup
-1. Clone this repository:
-   ```bash
-   git clone <your-repo-url>
-   cd docker-compose-files
-   ```
-
-2. Run the Docker setup script (Ubuntu):
-   ```bash
-   chmod +x docker_setup.sh
-   ./docker_setup.sh
-   ```
-
-3. Create the shared network:
-   ```bash
-   docker network create shared-net
-   ```
-
-4. Configure environment variables for each service (see individual service directories for `.env` examples)
-
-5. Start services individually or in groups:
-   ```bash
-   cd <service-directory>
-   docker-compose up -d
-   ```
 
 ## 📁 Services by Category
 
@@ -146,13 +120,60 @@ Most services require environment variables stored in `.env` files. Common varia
 - 4GB RAM (8GB+ recommended)
 - 2 CPU cores (4+ recommended)
 - 100GB storage (SSD recommended)
-- Ubuntu 20.04+ or similar Docker-compatible OS
+- Ubuntu 22.04+ or similar Docker-compatible OS
 
 ### Recommended Hardware
 - **GPU**: NVIDIA GPU for Plex transcoding, Frigate object detection, and Ollama
 - **Coral TPU**: For enhanced Frigate object detection
 - **USB Devices**: Zigbee coordinator, Z-Wave stick for Home Assistant
 - **Storage**: NAS or large external storage for media libraries
+
+### My Current Setup (Example Configuration)
+
+This homelab runs on a custom-built system optimized for 24/7 operation, media transcoding, and AI workloads:
+
+#### **Core Components**
+- **CPU**: AMD Ryzen 7 3700X (8-core, 3.6GHz) - Excellent performance/power ratio for containerized workloads
+- **Motherboard**: ASRock X470D4U2-2T - Server-grade board with dual 10G LAN and IPMI for remote management
+- **RAM**: 16GB Kingston Server Premier DDR4-2666 ECC - Error-correcting memory for stability
+- **GPU**: ASUS Dual RTX 3060 V2 OC (12GB GDDR6) - Powers Plex transcoding, Frigate AI, and Ollama LLMs
+
+#### **Storage Configuration**
+- **OS Drive**: WD Red SA500 1TB M.2 SSD - Fast, reliable storage for containers and databases
+- **Media Storage**: WD Red 6TB NAS HDD (5400 RPM) - High-capacity storage for Plex media library
+- **Additional**: 8x 3.5" drive bays available for expansion
+
+#### **Infrastructure**
+- **PSU**: EVGA 750W 80+ Gold Semi-Modular - Efficient power delivery with room for expansion
+- **Case**: Antec P101 Silent - Optimized for quiet operation with excellent drive capacity
+- **Networking**: Dual 10GbE ports for high-bandwidth applications and network redundancy
+- **Management**: IPMI support for remote server administration
+
+#### **Performance Benefits**
+- **ECC Memory**: Prevents data corruption in long-running containers
+- **10G Networking**: Enables fast file transfers and low-latency service communication
+- **GPU Acceleration**: Supports multiple simultaneous Plex transcodes and AI inference
+- **Silent Operation**: Designed for home environment with minimal noise
+
+### Operating System & Storage
+
+#### **OS Configuration**
+- **Distribution**: Ubuntu Server 24.04 LTS - Latest long-term support release with modern kernel
+- **File System**: ZFS - Advanced file system with built-in data integrity and snapshot capabilities
+- **RAID Configuration**: ZFS Mirror (RAID-1) - Provides redundancy and data protection
+- **Container Runtime**: Docker with Docker Compose - Industry-standard containerization
+
+#### **ZFS Benefits for Homelab**
+- **Data Integrity**: Built-in checksumming prevents silent data corruption
+- **Snapshots**: Point-in-time recovery for configuration backups
+- **Compression**: Automatic data compression saves storage space
+- **Scrubbing**: Regular data verification ensures long-term reliability
+- **Easy Expansion**: Simple pool expansion when adding drives
+
+#### **Storage Layout**
+- **System Pool**: ZFS mirror for OS and container data
+- **Media Storage**: Dedicated drives for large media files
+- **Backup Strategy**: ZFS snapshots combined with external backup solutions
 
 ## ️ Archived Services
 
@@ -200,14 +221,6 @@ Important data directories to backup:
 - Grafana dashboards provide system metrics
 - Healthchecks monitors service availability
 - SWAG logs provide access and security information
-
-## 🤝 Contributing
-
-Feel free to:
-- Report issues with configurations
-- Suggest improvements or optimizations
-- Share your own service additions
-- Provide feedback on documentation
 
 ## ⚠️ Security Notes
 
