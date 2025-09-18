@@ -5,8 +5,12 @@ services:
     networks:
       - shared-net
     labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8444
+      - swag_proto=http
+      - swag_url=nextcloud.*
       - com.centurylinklabs.watchtower.enable=false
-      # reverse proxy manually configured at swag/config/nginx/proxy-conf/nextcloud.subdomain.conf
     environment:
       - TZ=America/Chicago
       - REDIS_HOST=nextcloud-redis
@@ -17,7 +21,7 @@ services:
       - MYSQL_PASSWORD=${DB_PSSWD}
       - MYSQL_HOST=nextcloud-db
     ports:
-      - 8001:80
+      - 8444:80
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config:/var/www/html/config

@@ -7,32 +7,34 @@ services:
     environment:
       - PUID=1000
       - PGID=1002
-      - FILE__URL=/run/secrets/url
+      - URL=${DOMAIN_NAME}
       - VALIDATION=dns
       - SUBDOMAINS=wildcard
       - DNSPLUGIN=cloudflare
-      - DOCKER_MODS=linuxserver/mods:swag-auto-proxy|linuxserver/mods:universal-docker|linuxserver/mods:universal-cloudflared
+      - DOCKER_MODS=linuxserver/mods:swag-maxmind|linuxserver/mods:swag-dashboard|linuxserver/mods:swag-auto-proxy|linuxserver/mods:universal-docker|linuxserver/mods:universal-cloudflared
       - DOCKER_HOST=dockerproxy
       - FILE__CF_TUNNEL_CONFIG=/config/tunnelconfig.yml
       - PROPAGATION=60
       - TZ=America/Chicago
       - CERTPROVIDER=zerossl
-      - FILE__EMAIL=/run/secrets/email
-      - FILE__MAXMINDDB_LICENSE_KEY=/run/secrets/maxmind
+      - EMAIL=${EMAIL}
+      - MAXMINDDB_LICENSE_KEY=${MAXMINDDB_LICENSE_KEY}
+      - MAXMINDDB_USER_ID=${MAXMINDDB_USER_ID}
     env_file:
       - ./.env
     extra_hosts:
       - ${DOMAIN_NAME}:127.0.0.1
+    ports:
+      - 81:81
     restart: unless-stopped
     networks:
       - shared-net
     volumes:
     - ./config:/config
     - /etc/localtime:/etc/localtime:ro
-    secrets:
-    - url
-    - email
-    - maxmind
+    - ../vaultwarden/logs:/shared-logs/vaultwarden:ro
+    - ../nextcloud/data/nextcloud.log:/shared-logs/nextcloud/nextcloud.log:ro
+    - ../homeassistant/ha/config/home-assistant.log:/shared-logs/homeassistant/home-assistant.log
 
   dockerproxy:
     image: lscr.io/linuxserver/socket-proxy
@@ -45,14 +47,6 @@ services:
       - CONTAINERS=1
       - POST=0
     restart: unless-stopped
-
-secrets:
-  url:
-    file: url.txt
-  email:
-    file: email.txt
-  maxmind:
-    file: maxmind.txt
 
 networks:
   shared-net:

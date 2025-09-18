@@ -19,11 +19,10 @@ services:
     container_name: zigbee
     image: koenkk/zigbee2mqtt
     restart: unless-stopped
-    privileged: true
     networks:
       - shared-net
     ports:
-      - 9442:8080
+      - 8442:8080
     volumes:
       - ./zigbee/data:/app/data
       - /run/udev:/run/udev:ro
@@ -34,7 +33,7 @@ services:
     labels:
       - swag=enable
       - swag_address=${SWAG_ADDRESS}
-      - swag_port=9442
+      - swag_port=8442
       - swag_url=zigbee.*
 
   zwavejsui:
@@ -58,15 +57,18 @@ services:
       - swag_port=8091
       - swag_url=zwave.*
 
-#  rtlamr:
-#    container_name: rtlamr2mqtt
-#    image: allangood/rtlamr2mqtt
-#    restart: unless-stopped
-#    devices:
-#      - /dev/bus/usb
-#    volumes:
-#      - ./rtlamr2mqtt/rtlamr2mqtt.yaml:/etc/rtlamr2mqtt.yaml:ro
-#      - ./rtlamr2mqtt/data:/var/lib/rtlamr2mqtt
+  rtlamr:
+    container_name: rtlamr2mqtt
+    image: allangood/rtlamr2mqtt:2.3.4
+    restart: unless-stopped
+    environment:
+     - LISTEN_ONLY=yes
+     - RTL_MSGTYPE=all
+    devices:
+      - /dev/bus/usb
+    volumes:
+      - ./rtlamr2mqtt/rtlamr2mqtt.yaml:/etc/rtlamr2mqtt.yaml:ro
+      - ./rtlamr2mqtt/data:/var/lib/rtlamr2mqtt
 
 #  postgresdb:
 #    image: postgres:16-alpine
@@ -159,7 +161,7 @@ services:
     container_name: frigate
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
-    image: ghcr.io/blakeblackshear/frigate:0.15.0-rc2
+    image: ghcr.io/blakeblackshear/frigate:0.16.0
     networks:
       - shared-net
     shm_size: "264mb"
@@ -187,11 +189,12 @@ services:
       - "8555:8555"
     env_file:
       - ./frigate/.env
-    #labels:
-      #- swag=enable
-      #- swag_address=${SWAG_ADDRESS}
-      #- swag_port=8971
-      #- swag_url=frigate.*
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8971
+      - swag_proto=http
+      - swag_url=frigate.*
 
   homeassistant:
     container_name: homeassistant
@@ -207,6 +210,7 @@ services:
       - PUID=1000
       - PGID=1002
       - TZ=America/Chicago
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     volumes:
       - /run/dbus:/run/dbus:ro
       - ./ha/config:/config

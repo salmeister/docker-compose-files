@@ -1,0 +1,12 @@
+*
+!*/
+!**/docker-compose.yml
+!**/docker-compose.yaml
+!**/*.sh
+!/*.gitignore
+!**/README.md
+**/prometheus/**/README.md
+**/ollama/**/README.md
+**/homeassistant/ha/config/
+**/homeassistant/esphome/
+**/homeassistant/codeserver/
