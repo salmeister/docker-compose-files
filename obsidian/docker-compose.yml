@@ -1,4 +1,25 @@
 services:
+  obsidian:
+    image: lscr.io/linuxserver/obsidian:latest
+    container_name: obsidian
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=3111
+      - swag_url=notes.*
+    environment:
+      - PUID=1000
+      - PGID=1002
+      - TZ=America/Chicago
+    volumes:
+      - ./obsidian/config:/config
+    ports:
+      - 3111:3000
+      - 3001:3001
+    networks:
+      - shared-net
+    shm_size: "1gb"
+    restart: unless-stopped
   obsidian-livesync:
     container_name: obsidian-livesync
     image: couchdb:3.3.3
@@ -22,7 +43,7 @@ services:
       - swag=enable
       - swag_address=${SWAG_ADDRESS}
       - swag_port=5984
-      - swag_url=notes.*
+      - swag_url=secondbrain.*
 
 volumes:
   data:
