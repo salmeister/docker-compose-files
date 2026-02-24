@@ -57,18 +57,18 @@ services:
       - swag_port=8091
       - swag_url=zwave.*
 
-  rtlamr:
-    container_name: rtlamr2mqtt
-    image: allangood/rtlamr2mqtt:2.3.4
-    restart: unless-stopped
-    environment:
-     - LISTEN_ONLY=yes
-     - RTL_MSGTYPE=all
-    devices:
-      - /dev/bus/usb
-    volumes:
-      - ./rtlamr2mqtt/rtlamr2mqtt.yaml:/etc/rtlamr2mqtt.yaml:ro
-      - ./rtlamr2mqtt/data:/var/lib/rtlamr2mqtt
+        #  rtlamr:
+        #container_name: rtlamr2mqtt
+        #image: allangood/rtlamr2mqtt:2.3.4
+        #restart: unless-stopped
+        #environment:
+        #- LISTEN_ONLY=yes
+        #- RTL_MSGTYPE=all
+        #devices:
+        #- /dev/bus/usb
+        #volumes:
+        #- ./rtlamr2mqtt/rtlamr2mqtt.yaml:/etc/rtlamr2mqtt.yaml:ro
+        #- ./rtlamr2mqtt/data:/var/lib/rtlamr2mqtt
 
 #  postgresdb:
 #    image: postgres:16-alpine
@@ -161,7 +161,7 @@ services:
     container_name: frigate
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
-    image: ghcr.io/blakeblackshear/frigate:0.16.1
+    image: ghcr.io/blakeblackshear/frigate:0.16.4
     networks:
       - shared-net
     shm_size: "264mb"

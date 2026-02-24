@@ -1,0 +1,139 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: baseballforward-db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    networks:
+      - shared-net
+    restart: unless-stopped
+
+  api:
+    image: ghcr.io/salmeister/api-baseballforward:stage
+    container_name: baseballforward-api
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=32777
+      - swag_url=bfapi.*
+    ports:
+      - "32777:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - CollegeScorecard__ApiKey=${COLLEGE_SCORECARD_KEY}
+      - StripeSettings__SecretKey=${STRIPE_SECRET_KEY}
+      - StripeSettings__PublishableKey=${STRIPE_PUBLISHABLE_KEY}
+      - StripeSettings__WebhookSecret=${WEBHOOK_SECRET}
+      - StripeSettings__BasicProductId=${BASIC_PRODUCT_ID}
+      - StripeSettings__StandardProductId=${STANDARD_PRODUCT_ID}
+      - StripeSettings__MembersProductId=${MEMBERS_PRODUCT_ID}
+      - StripeSettings__MembersMonthlyPriceId=${MEMBERS_MONTHLY_PRICE_ID}
+      - StripeSettings__MembersAnnualPriceId=${MEMBERS_ANNUAL_PRICE_ID}
+      - DigitalOceanSpaces__AccessKey=${DOS_ACCESS_KEY}
+      - DigitalOceanSpaces__SecretKey=${DOS_SECRET_KEY}
+      - DigitalOceanSpaces__BucketName=${DOS_BUCKET_NAME}
+      - DigitalOceanSpaces__Region=${DOS_REGION}
+      - DigitalOceanSpaces__ServiceUrl=${DOS_SERVICE_URL}
+      - DigitalOceanSpaces__CdnEndpoint=${DOS_CDN_ENDPOINT}
+      - DigitalOceanSpaces__EnvironmentPrefix=${DOS_ENV_PREFIX}
+      - JWTSettings__SecretKey=${JWT_SECRET}
+      - JWTSettings__Issuer=${JWT_ISSUER}
+      - JWTSettings__Audience=${JWT_AUDIENCE}
+      - GoogleAuthSettings__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - GoogleAuthSettings__ClientId=${GOOGLE_CLIENT_ID}
+      - XAuthSettings__ClientId=${X_CLIENT_ID}
+      - XAuthSettings__ClientSecret=${X_CLIENT_SECRET}
+      - AppleAuthSettings__ClientId=${APPLE_CLIENT_ID}
+      - AppleAuthSettings__TeamId=${APPLE_TEAM_ID}
+      - AppleAuthSettings__KeyId=${APPLE_KEY_ID}
+      - AppleAuthSettings__PrivateKeyBase64=${APPLE_PRIVATE_KEY_BASE64}
+      - TurnstileSettings__SecretKey=${TURNSTILE_SECRET_KEY}
+      - TurnstileSettings__SiteKey=${TURNSTILE_SITE_KEY}
+      - EmailSettings__ResendApiKey=${RESEND_APIKEY}
+      - EmailSettings__FromEmail=${FROM_EMAIL}
+      - EmailSettings__FromName=${FROM_NAME}
+      - EmailSettings__AdminEmail=${ADMIN_EMAIL}
+      - EmailSettings__ContactEmail=${CONTACT_EMAIL}
+      - EmailSettings__UnsubscribeUrl=${UNSUBSCRIBE_URL}
+      - EmailSettings__LogoUrl=${EMAIL_LOGO_URL}
+      - EmailSettings__PasswordResetExpirationMinutes=${PASSWORD_RESET_LIMIT}
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - shared-net
+
+  ui-recruiting:
+    image: ghcr.io/salmeister/baseball-forward-recruiting:stage
+    container_name: baseballforward-recruiting
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=9898
+      - swag_url=bfrecruiting.*
+    ports:
+      - "9898:80"
+    environment:
+      - VITE_API_URL=${API_URL}
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - VITE_X_CLIENT_ID=${X_CLIENT_ID}
+      - VITE_X_ENABLED=true
+      - VITE_APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+      - VITE_APPLE_ENABLED=true
+      - VITE_JWT_ISSUER=${JWT_ISSUER}
+      - VITE_JWT_AUDIENCE=${JWT_AUDIENCE}
+      - VITE_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - VITE_PLATFORM=recruiting
+    depends_on:
+      - api
+    networks:
+      - shared-net
+    restart: unless-stopped
+
+  ui-web:
+    image: ghcr.io/salmeister/baseball-forward-home:stage
+    container_name: baseballforward-web
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=9899
+      - swag_url=baseballforward.*
+    ports:
+      - "9899:80"
+    environment:
+      - VITE_MEMBERS_ENABLED=true
+      - VITE_API_URL=${API_URL}
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - VITE_X_CLIENT_ID=${X_CLIENT_ID}
+      - VITE_X_ENABLED=true
+      - VITE_APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+      - VITE_APPLE_ENABLED=true
+      - VITE_JWT_ISSUER=${JWT_ISSUER}
+      - VITE_JWT_AUDIENCE=${JWT_AUDIENCE}
+      - VITE_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - VITE_PLATFORM=members
+      - VITE_RECRUITING_APP_URL=${RECRUITING_URL}
+    depends_on:
+      - api
+    networks:
+      - shared-net
+    restart: unless-stopped
+
+volumes:
+  database_data:
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
+
+x-registry-auth: &registry-auth
+  username: ${GITHUB_USERNAME}
+  password: ${GITHUB_TOKEN}

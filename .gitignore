@@ -1,14 +1,20 @@
+# Ignore everything
 *
-!*/
-!**/docker-compose.yml
-!**/docker-compose.yaml
-!**/*.sh
-!/*.gitignore
-!**/README.md
-**/prometheus/**/README.md
-**/ollama/**/README.md
-**/mealie/**/README.md
-**/nextcloud/**/*.md
-**/homeassistant/ha/config/
-**/homeassistant/esphome/
-**/homeassistant/codeserver/
+
+# Allow ONLY direct subdirectories (1 level deep) — stops recursive traversal
+!/*/
+# Root-level files to keep
+!docker-compose.yml
+!docker-compose.yaml
+!*.sh
+!.gitignore
+!README.md
+
+# 1-folder-deep files to keep
+!/*/docker-compose.yml
+!/*/docker-compose.yaml
+!/*/*.sh
+!/*/README.md
+
+# Explicit exclusions (override the README.md unignore above)
+/bfbackups/*

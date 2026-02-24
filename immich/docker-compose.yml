@@ -18,8 +18,8 @@ services:
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
-      - /nas/home_content/Pictures:/mnt/media/pictures:ro
-      - /nas/home_conent/Videos:/mnt/media/videos:ro
+      - /nas/home_content/Pictures:/mnt/media/pictures
+      - /nas/home_content/Videos:/mnt/media/videos
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env

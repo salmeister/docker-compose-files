@@ -1,0 +1,57 @@
+services:
+  vikunja:
+    image: vikunja/vikunja
+    container_name: vikunja
+    environment:
+      PUID: 1000
+      PGID: 1002
+      VIKUNJA_SERVICE_PUBLICURL: ${DOMAIN}
+      VIKUNJA_DATABASE_HOST: vikunja-db
+      VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PSSWD}
+      VIKUNJA_DATABASE_TYPE: postgres
+      VIKUNJA_DATABASE_USER: ${POSTGRES_USR}
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET}
+      #VIKUNJA_SERVICE_ENABLEREGISTRATION: false
+    ports:
+      - 3456:3456
+    volumes:
+      - ./files:/app/vikunja/files
+    depends_on:
+      vikunja-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - vikunja-internal
+      - shared-net
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=3456
+      - swag_url=boards.*
+
+  vikunja-db:
+    image: postgres:18
+    container_name: vikunja-db
+    environment:
+      POSTGRES_DB: vikunja
+      POSTGRES_PASSWORD: ${POSTGRES_PSSWD}
+      POSTGRES_USER: ${POSTGRES_USR}
+    volumes:
+      - ./db:/var/lib/postgresql
+    restart: unless-stopped
+    networks:
+      - vikunja-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d vikunja"]
+      interval: 2s
+      start_period: 30s
+
+networks:
+  vikunja-internal:
+  shared-net:
+    external: true
+
+volumes:
+  vikunja-db:
+  vikunja-files:

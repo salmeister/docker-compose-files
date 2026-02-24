@@ -1,14 +1,14 @@
 services:
-  traffic_control:
-    image: lukaszlach/docker-tc
-    container_name: traffic_control
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./traffic-control:/var/docker-tc
+#  traffic_control:
+#    image: lukaszlach/docker-tc
+#    container_name: traffic_control
+#    network_mode: host
+#    cap_add:
+#      - NET_ADMIN
+#    restart: always
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ./traffic-control:/var/docker-tc
   ollama:
     volumes:
       - ./ollama-data:/root/.ollama
@@ -18,24 +18,34 @@ services:
     restart: unless-stopped
     image: ollama/ollama:latest
     ports:
-      - 7869:11434
+      - 11434:11434
     environment:
       - OLLAMA_KEEP_ALIVE=24h
-    dns:
-      - "1.1.1.1"
-      - "8.8.8.8"
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_FLASH_ATTENTION=1
+    shm_size: '8gb'
     networks:
       - shared-net
-    labels:
-      com.docker-tc.enabled: "1"
-      com.docker-tc.limit: "2mbps"
+ #   labels:
+ #     com.docker-tc.enabled: "1"
+ #     com.docker-tc.limit: "2mbps"
     deploy:
       resources:
+        limits:
+          memory: 60gb
+          cpus: 8
         reservations:
+          memory: 32gb
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]
+    ulimits:
+      memlock: -1
+      nofile:
+        soft: 65536
+        hard: 65536
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -47,12 +57,11 @@ services:
     ports:
       - 8877:8080
     environment: # https://docs.openwebui.com/getting-started/env-configuration#default_models
-      - OLLAMA_BASE_URLS=http://host.docker.internal:7869 #comma separated ollama hosts
+      - OLLAMA_BASE_URLS=http://ollama:11434
       - WEBUI_AUTH=True
+      - ENABLE_BASE_MODELS_CACHE=true
     env_file:
       - ./.env
-    extra_hosts:
-      - host.docker.internal:host-gateway
     restart: unless-stopped
     networks:
       - shared-net
