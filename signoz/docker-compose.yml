@@ -65,7 +65,7 @@ services:
         condition: service_healthy
     environment:
       - CLICKHOUSE_URL=tcp://clickhouse:9000
-    command: ["sync"]
+    command: ["sync", "--dsn=tcp://clickhouse:9000"]
     labels:
       - com.centurylinklabs.watchtower.enable=false
     networks:
