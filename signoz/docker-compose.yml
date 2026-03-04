@@ -45,7 +45,7 @@ services:
       timeout: 5s
       retries: 3
     environment:
-      - CLICKHOUSE_PASSWORD=
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASS}
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     ulimits:
