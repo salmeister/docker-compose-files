@@ -1,0 +1,107 @@
+services:
+  signoz:
+    image: signoz/signoz:latest
+    container_name: signoz
+    restart: unless-stopped
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      schema-migrator-sync:
+        condition: service_completed_successfully
+    environment:
+      - DASHBOARDS_PATH=/root/config/dashboards
+      - STORAGE=clickhouse
+      - GODEBUG=netdns=go
+      - TELEMETRY_ENABLED=true
+      - DEPLOYMENT_TYPE=docker-standalone-amd
+      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
+      - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
+      # SMTP for SigNoz alerts — update to Resend when ready
+      - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__SMARTHOST=${SMTP_HOST}
+      - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__FROM=${SMTP_FROM}
+      - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__AUTH__USERNAME=${SMTP_USER}
+      - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__AUTH__PASSWORD=${SMTP_PASS}
+      - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__REQUIRE__TLS=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/prometheus.yml:/root/config/prometheus.yml:rw
+      - ./config/dashboards:/root/config/dashboards:rw
+      - signoz-sqlite:/var/lib/signoz
+    labels:
+      - swag=enable
+      - swag_url=logs.*
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8080
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - shared-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.5.6
+    container_name: clickhouse
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./config/clickhouse-config.xml:/etc/clickhouse-server/config.d/signoz.xml:ro
+      - ./config/clickhouse-users.xml:/etc/clickhouse-server/users.d/signoz.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    labels:
+      - com.centurylinklabs.watchtower.enable=false  # Pin ClickHouse — only upgrade intentionally
+    networks:
+      - shared-net
+
+  schema-migrator-sync:
+    image: signoz/schema-migrator:latest
+    container_name: schema-migrator-sync
+    restart: on-failure
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      - CLICKHOUSE_URL=tcp://clickhouse:9000
+    command: ["sync"]
+    labels:
+      - com.centurylinklabs.watchtower.enable=false  # Runs once per stack start
+    networks:
+      - shared-net
+
+  signoz-otel-collector:
+    image: signoz/signoz-otel-collector:latest
+    container_name: signoz-otel-collector
+    restart: unless-stopped
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=host.name=SALASROCK
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel/config.yaml:ro
+    command: ["--config=/etc/otel/config.yaml"]
+    ports:
+      - "4317:4317"   # OTLP gRPC (Vector → SigNoz)
+      - "4318:4318"   # OTLP HTTP
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - shared-net
+
+volumes:
+  signoz-sqlite:
+    name: signoz-sqlite   # Keep existing volume name so account/data survives
+  clickhouse-data:
+    name: signoz-clickhouse-data
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
