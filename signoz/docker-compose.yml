@@ -81,7 +81,10 @@ services:
         condition: service_healthy
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=SALASROCK
-      - CLICKHOUSE_URL=clickhouse://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+    volumes:
+      - /nas/docker/signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
       - "4317:4317"
       - "4318:4318"
