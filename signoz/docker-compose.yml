@@ -81,7 +81,7 @@ services:
         condition: service_healthy
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=SALASROCK
-      - CLICKHOUSE_URL=tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000
+      - CLICKHOUSE_URL=clickhouse://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000
     ports:
       - "4317:4317"
       - "4318:4318"
