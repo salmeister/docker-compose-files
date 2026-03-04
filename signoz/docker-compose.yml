@@ -17,7 +17,6 @@ services:
       - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
       - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
       - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
-      # SMTP for SigNoz alerts — update to Resend when ready
       - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__SMARTHOST=${SMTP_HOST}
       - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__FROM=${SMTP_FROM}
       - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__AUTH__USERNAME=${SMTP_USER}
@@ -49,14 +48,12 @@ services:
       retries: 3
     volumes:
       - clickhouse-data:/var/lib/clickhouse
-      - ./config/clickhouse-config.xml:/etc/clickhouse-server/config.d/signoz.xml:ro
-      - ./config/clickhouse-users.xml:/etc/clickhouse-server/users.d/signoz.xml:ro
     ulimits:
       nofile:
         soft: 262144
         hard: 262144
     labels:
-      - com.centurylinklabs.watchtower.enable=false  # Pin ClickHouse — only upgrade intentionally
+      - com.centurylinklabs.watchtower.enable=false
     networks:
       - shared-net
 
@@ -71,7 +68,7 @@ services:
       - CLICKHOUSE_URL=tcp://clickhouse:9000
     command: ["sync"]
     labels:
-      - com.centurylinklabs.watchtower.enable=false  # Runs once per stack start
+      - com.centurylinklabs.watchtower.enable=false
     networks:
       - shared-net
 
@@ -84,12 +81,9 @@ services:
         condition: service_healthy
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=SALASROCK
-    volumes:
-      - ./config/otel-collector-config.yaml:/etc/otel/config.yaml:ro
-    command: ["--config=/etc/otel/config.yaml"]
     ports:
-      - "4317:4317"   # OTLP gRPC (Vector → SigNoz)
-      - "4318:4318"   # OTLP HTTP
+      - "4317:4317"
+      - "4318:4318"
     labels:
       - com.centurylinklabs.watchtower.enable=true
     networks:
@@ -97,7 +91,7 @@ services:
 
 volumes:
   signoz-sqlite:
-    name: signoz-sqlite   # Keep existing volume name so account/data survives
+    name: signoz-sqlite
   clickhouse-data:
     name: signoz-clickhouse-data
 
