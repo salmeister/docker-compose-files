@@ -93,7 +93,7 @@ volumes:
   signoz-sqlite:
     name: signoz-sqlite
   clickhouse-data:
-    name: signoz-clickhouse-data
+    name: signoz-clickhouse
 
 networks:
   shared-net:
