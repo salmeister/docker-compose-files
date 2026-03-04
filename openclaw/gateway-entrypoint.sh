@@ -14,6 +14,33 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
 echo "Brew ready: $(brew --version)"
 
+# QMD memory backend — persistent binary in OpenClaw data volume.
+# Survives container restarts. Only rebuilds on fresh/wiped volume.
+QMD_BIN="/home/node/.openclaw/bin/qmd"
+QMD_DIST="/home/node/.openclaw/bin/qmd-dist"
+if [ ! -x "$QMD_BIN" ] || [ ! -d "$QMD_DIST" ]; then
+  echo 'QMD not found in persistent volume — installing from scratch...'
+  if [ ! -x "/home/node/.bun/bin/bun" ]; then
+    curl -fsSL https://bun.sh/install | bash
+  fi
+  export PATH="/home/node/.bun/bin:$PATH"
+  bun install -g "https://github.com/tobi/qmd"
+  QMD_PKG="/home/node/.bun/install/global/node_modules/@tobilu/qmd"
+  cd "$QMD_PKG"
+  bun add -d @types/node 2>/dev/null || true
+  bun run build 2>/dev/null || true
+  cd -
+  mkdir -p "$QMD_DIST"
+  cp -r "$QMD_PKG/dist/"* "$QMD_DIST/"
+  cp -r "$QMD_PKG/node_modules" "$QMD_DIST/node_modules"
+  echo '{"type":"module"}' > "$QMD_DIST/package.json"
+  printf '#!/bin/sh\nexec node /home/node/.openclaw/bin/qmd-dist/qmd.js "$@"\n' > "$QMD_BIN"
+  chmod +x "$QMD_BIN"
+  echo "QMD installed to persistent volume: $QMD_BIN"
+else
+  echo "QMD found at $QMD_BIN (persistent — skipping install)"
+fi
+
 # Install Chromium if needed (browser control)
 # NOTE: The apt chromium package is a snap stub that doesn't work in Docker.
 # We use Playwright's bundled Chromium instead (see below). This block is intentionally

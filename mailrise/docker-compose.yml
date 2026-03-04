@@ -1,0 +1,16 @@
+services:
+  mailrise:
+    image: yoryan/mailrise:latest
+    container_name: mailrise
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+    volumes:
+      - ./config/mailrise.conf:/etc/mailrise.conf:ro
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
