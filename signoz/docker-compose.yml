@@ -63,7 +63,7 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
-    command: ["sync", "--dsn=tcp://default:@clickhouse:9000"]
+    command: ["sync", "--dsn=tcp://default:@clickhouse:9000", "--dev"]
     labels:
       - com.centurylinklabs.watchtower.enable=false
     networks:
