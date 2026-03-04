@@ -14,7 +14,7 @@ services:
       - GODEBUG=netdns=go
       - TELEMETRY_ENABLED=true
       - DEPLOYMENT_TYPE=docker-standalone-amd
-      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://default:@clickhouse:9000
+      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
       - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
       - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
       - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__SMARTHOST=${SMTP_HOST:-smtp.gmail.com:587}
@@ -46,8 +46,6 @@ services:
       retries: 3
     volumes:
       - clickhouse-data:/var/lib/clickhouse
-      - /nas/docker/signoz-dev/signoz/deploy/common/clickhouse/users.xml:/etc/clickhouse-server/users.d/users.xml:ro
-      - /nas/docker/signoz-dev/signoz/deploy/common/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
     ulimits:
       nofile:
         soft: 262144
@@ -64,7 +62,7 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
-    command: ["sync", "--dsn=tcp://default:@clickhouse:9000", "--dev"]
+    command: ["sync", "--dsn=tcp://clickhouse:9000", "--dev"]
     labels:
       - com.centurylinklabs.watchtower.enable=false
     networks:
@@ -93,7 +91,6 @@ volumes:
     external: true
   clickhouse-data:
     name: signoz-clickhouse
-    external: true
 
 networks:
   shared-net:
