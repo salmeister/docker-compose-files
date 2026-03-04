@@ -45,7 +45,7 @@ services:
       timeout: 5s
       retries: 3
     environment:
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASS}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
     volumes:
       - clickhouse-data:/var/lib/clickhouse
       - /nas/docker/signoz/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
