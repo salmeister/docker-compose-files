@@ -25,8 +25,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./config/prometheus.yml:/root/config/prometheus.yml:rw
-      - ./config/dashboards:/root/config/dashboards:rw
+      - ./config:/root/config
       - signoz-sqlite:/var/lib/signoz
     labels:
       - swag=enable
