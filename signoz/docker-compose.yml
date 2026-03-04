@@ -14,7 +14,7 @@ services:
       - GODEBUG=netdns=go
       - TELEMETRY_ENABLED=true
       - DEPLOYMENT_TYPE=docker-standalone-amd
-      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000
       - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
       - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
       - SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_SMTP__SMARTHOST=${SMTP_HOST}
@@ -64,7 +64,7 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
-    command: ["sync", "--dsn=tcp://clickhouse:9000", "--dev"]
+    command: ["sync", "--dsn=tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000", "--dev"]
     labels:
       - com.centurylinklabs.watchtower.enable=false
     networks:
