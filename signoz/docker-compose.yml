@@ -83,12 +83,16 @@ services:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=SALASROCK
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
     volumes:
-      - /nas/docker/signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+      - /nas/docker/signoz/collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
     command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
       - "4317:4317"
       - "4318:4318"
     labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=4318
+      - swag_url=ingress.*
       - com.centurylinklabs.watchtower.enable=true
     networks:
       - shared-net
