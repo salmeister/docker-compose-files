@@ -6,11 +6,12 @@ services:
     volumes:
       - ./config/vector.yaml:/etc/vector/vector.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log:/var/log/host:ro
-      - /run/log/journal:/run/log/journal:ro
-      - /etc/machine-id:/etc/machine-id:ro
+      - /var/log/syslog:/var/log/syslog:ro
+      - /var/log/auth.log:/var/log/auth.log:ro
     environment:
       - VECTOR_LOG=info
+    ports:
+      - "514:514/udp"
     networks:
       - shared-net
 
