@@ -1,7 +1,7 @@
 services:
     portainer:
         container_name: portainer
-        image: portainer/portainer-ce
+        image: portainer/portainer-ce:2.45.2
         command: -H unix:///var/run/docker.sock
         labels:
           - swag=enable

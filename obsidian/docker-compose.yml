@@ -8,9 +8,9 @@ services:
       - swag_port=3111
       - swag_url=notes.*
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
     volumes:
       - ./obsidian/config:/config
     ports:
@@ -23,11 +23,12 @@ services:
   obsidian-livesync:
     container_name: obsidian-livesync
     image: couchdb:3.3.3
+    build: .
     environment:
-      - PUID=1000
-      - PGID=1002
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
       - UMASK=0022
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
     env_file:
       - ./.env
     volumes:
@@ -37,11 +38,17 @@ services:
     networks:
       - shared-net
     ports:
-      - 5984:5984
+      - 127.0.0.1:5984:5984
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
     labels:
       - swag=enable
-      - swag_address=${SWAG_ADDRESS}
+      - swag_address=obsidian-livesync
       - swag_port=5984
       - swag_url=secondbrain.*
 

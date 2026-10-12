@@ -8,6 +8,12 @@ services:
       - POSTGRES_DB=${DB_NAME}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -42,7 +48,8 @@ services:
       - Email_Settings__AdminEmail${ADMIN_EMAIL}
     restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - shared-net
 

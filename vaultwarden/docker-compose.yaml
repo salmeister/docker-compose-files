@@ -1,7 +1,7 @@
 services:
   vaultwarden:
     container_name: vaultwarden
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:1.37.4
     networks:
       - shared-net
     restart: unless-stopped
@@ -10,9 +10,9 @@ services:
     - ./logs:/logs
     environment:
       - SIGNUPS_ALLOWED=false
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - WEBSOCKET_ENABLED=true
       - DOMAIN=${DOMAIN}
       - ADMIN_TOKEN=${ADMIN_TOKEN}

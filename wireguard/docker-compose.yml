@@ -6,9 +6,9 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - SERVERURL=auto
       - SERVERPORT=51820
       - PEERS=2

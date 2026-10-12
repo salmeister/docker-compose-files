@@ -3,12 +3,12 @@ services:
     container_name: mosquitto
     image:  eclipse-mosquitto:latest
     ports:
-      - 1883:1883
-      - 9001:9001
+      - 1883:1883 # LAN MQTT for ESPHome / Zigbee devices
+      - 127.0.0.1:9001:9001
     networks:
       - shared-net
     environment:
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
     volumes:
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/config:/mosquitto/config
@@ -29,7 +29,7 @@ services:
     devices:
       - /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0:/dev/ttyUSB0
     environment:
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
     labels:
       - swag=enable
       - swag_address=${SWAG_ADDRESS}
@@ -121,19 +121,19 @@ services:
       - ./ha/config:/data
       - ./codeserver/vsixs:/installs
     ports:
-      - 9876:8443
+      - 127.0.0.1:9876:8443
     networks:
       - shared-net
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - DEFAULT_WORKSPACE=/data
     restart: unless-stopped
     labels:
       - swag=enable
-      - swag_address=${SWAG_ADDRESS}
-      - swag_port=9876
+      - swag_address=code-server
+      - swag_port=8443
       - swag_url=vscode.*
 
   esphome:
@@ -142,7 +142,7 @@ services:
     networks:
       - shared-net
     environment:
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
       - ESPHOME_DASHBOARD_USE_PING=true
     ports:
       - 6052:6052
@@ -159,7 +159,7 @@ services:
 
   frigate:
     container_name: frigate
-    privileged: true # this may not be necessary for all setups
+    # revert to privileged if Coral/GPU detection fails
     restart: unless-stopped
     image: ghcr.io/blakeblackshear/frigate:0.18.0
     networks:
@@ -173,7 +173,8 @@ services:
               count: 1 # number of GPUs
               capabilities: [gpu]
     devices:
-      - "/dev/apex_0:/dev/apex_0"
+      - /dev/apex_0:/dev/apex_0
+      - /dev/bus/usb:/dev/bus/usb
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./frigate/config/:/config
@@ -183,22 +184,22 @@ services:
         tmpfs:
           size: 1000000000
     ports:
-      - "8971:8971"
-      - "5555:5000"
+      - "127.0.0.1:8971:8971"
+      - "127.0.0.1:5555:5000"
       - "8554:8554"
       - "8555:8555"
     env_file:
       - ./frigate/.env
     labels:
       - swag=enable
-      - swag_address=${SWAG_ADDRESS}
+      - swag_address=frigate
       - swag_port=8971
       - swag_proto=http
       - swag_url=frigate.*
 
   homeassistant:
     container_name: homeassistant
-    image: lscr.io/linuxserver/homeassistant:latest
+    image: lscr.io/linuxserver/homeassistant:2026.10.1
 #    depends_on:
 #      postgresdb:
 #        condition: service_healthy
@@ -207,9 +208,9 @@ services:
     devices:
       - /dev/bus/usb:/dev/bus/usb
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - GIT_CONFIG_COUNT=1
       - GIT_CONFIG_KEY_0=safe.directory
       - GIT_CONFIG_VALUE_0=/config

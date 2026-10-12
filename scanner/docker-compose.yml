@@ -5,7 +5,7 @@ services:
     networks:
       - shared-net
     environment:
-      TZ: America/Chicago
+      TZ: ${TZ:-America/Chicago}
       SCANIMAGE_LIST_IGNORE: "true"
       DEVICES: airscan:e0:G3270
     ports:

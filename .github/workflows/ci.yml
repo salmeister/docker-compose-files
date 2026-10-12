@@ -1,0 +1,82 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  compose-config:
+    name: compose config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Validate every stack
+        run: |
+          set -euo pipefail
+          python3 << 'PY'
+          import pathlib, re, subprocess, sys
+
+          root = pathlib.Path(".").resolve()
+          composes = sorted(list(root.glob("*/docker-compose.yml")) + list(root.glob("*/docker-compose.yaml")))
+
+          for example in root.glob("*/.env.example"):
+              target = example.with_name(".env")
+              if not target.exists():
+                  target.write_text(example.read_text())
+
+          env_file_re = re.compile(r"(?m)^[ \t]*env_file:[ \t]*\n((?:[ \t]+-[ \t]+\S+[ \t]*\n)+)")
+          file_re = re.compile(r"(?m)^[ \t]*file:[ \t]*(\S+)[ \t]*$")
+
+          for compose in composes:
+              text = compose.read_text()
+              directory = compose.parent
+              for match in env_file_re.finditer(text):
+                  for item in re.findall(r"[ \t]*-[ \t]*(\S+)", match.group(1)):
+                      path = (directory / item).resolve()
+                      path.parent.mkdir(parents=True, exist_ok=True)
+                      if not path.exists():
+                          path.write_text("")
+              for match in file_re.finditer(text):
+                  raw = match.group(1)
+                  path = (directory / raw).resolve()
+                  path.parent.mkdir(parents=True, exist_ok=True)
+                  if path.exists():
+                      continue
+                  if path.suffix in {".yml", ".yaml"}:
+                      path.write_text("services:\n  cuda: {}\n")
+                  else:
+                      path.write_text("example\n")
+
+          failed = False
+          for compose in composes:
+              rel = compose.relative_to(root)
+              print(f"== docker compose -f {rel} config -q", flush=True)
+              result = subprocess.run(
+                  ["docker", "compose", "-f", str(rel), "config", "-q"],
+                  cwd=root,
+              )
+              if result.returncode != 0:
+                  failed = True
+                  print(f"FAILED {rel}", file=sys.stderr)
+          if failed:
+              sys.exit(1)
+          PY
