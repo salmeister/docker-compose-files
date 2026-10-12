@@ -24,5 +24,8 @@
 !.github/**
 !.pre-commit-config.yaml
 
-# Explicit exclusions (override the README.md unignore above)
+# Explicit exclusions (override the un-ignore rules above).
+# Personal stacks stay on the host and are not part of this public repo.
+/baseballforward/
+/selfdiscipline/
 /bfbackups/*
