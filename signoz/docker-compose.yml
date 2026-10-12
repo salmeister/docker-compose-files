@@ -25,7 +25,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - signoz-sqlite:/var/lib/signoz
+      - ./db/sqlite:/var/lib/signoz
     labels:
       - swag=enable
       - swag_url=logs.*
@@ -47,7 +47,7 @@ services:
     environment:
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
+      - ./clickhouse/data:/var/lib/clickhouse
       - /nas/docker/signoz/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
       - /nas/docker/signoz/clickhouse/keeper.xml:/etc/clickhouse-server/config.d/keeper.xml:ro
     ulimits:
@@ -96,13 +96,6 @@ services:
       - com.centurylinklabs.watchtower.enable=true
     networks:
       - shared-net
-
-volumes:
-  signoz-sqlite:
-    name: signoz-sqlite
-    external: true
-  clickhouse-data:
-    name: signoz-clickhouse
 
 networks:
   shared-net:

@@ -1,0 +1,31 @@
+services:
+  scanservjs:
+    image: sbs20/scanservjs:latest
+    container_name: scanservjs
+    networks:
+      - shared-net
+    environment:
+      TZ: America/Chicago
+      SCANIMAGE_LIST_IGNORE: "true"
+      DEVICES: airscan:e0:G3270
+    ports:
+      - 8789:8080
+    volumes:
+      - ./airscan.conf:/etc/sane.d/airscan.conf:ro
+      - scanservjs-output:/var/lib/scanservjs/output
+      - scanservjs-config:/etc/etc/scanservjs
+    restart: unless-stopped
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8789
+      - swag_url=${SWAG_URL:-scan.*}
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
+
+volumes:
+  scanservjs-output:
+  scanservjs-config:

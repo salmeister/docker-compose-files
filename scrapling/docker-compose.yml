@@ -1,0 +1,23 @@
+services:
+  scrapling-sidecar:
+    image:  ghcr.io/salmeister/scrapling-sidecar:latest
+    container_name: scrapling
+    networks:
+      - shared-net
+    environment:
+      - TZ=America/Chicago
+      - PORT=8080
+      - SCRAPLING_SIDECAR_TOKEN=${SCRAPLING_SIDECAR_TOKEN}
+    ports:
+      - 8788:8080
+    restart: unless-stopped
+    labels:
+      - swag=enable
+      - swag_address=${SWAG_ADDRESS}
+      - swag_port=8788
+      - swag_url=${SWAG_URL:-scrapling.*}
+
+networks:
+  shared-net:
+    external: true
+    name: shared-net
