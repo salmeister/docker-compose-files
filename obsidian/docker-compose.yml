@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
   obsidian-livesync:
     container_name: obsidian-livesync
-    image: obsidian-couchdb:3.3.3
+    image: couchdb:3.3.3
     build: .
     environment:
       - PUID=${PUID:-1000}
