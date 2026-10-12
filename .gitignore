@@ -16,6 +16,8 @@
 !/*/*.sh
 !/*/README.md
 !/*/.env.example
+!/*/Dockerfile
+!/*/.dockerignore
 
 # CI and local secret scanning (still default-deny everywhere else)
 !.github/

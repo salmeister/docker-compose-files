@@ -184,7 +184,6 @@ services:
     stdin_open: true
     tty: true
     init: true
-    restart: unless-stopped
     user: "0:0" # Run the container as root user
     entrypoint: ["node", "dist/index.js"]
 
