@@ -1,6 +1,6 @@
-# SALASROCK homelab Compose
+# ASROCK homelab Compose
 
-Docker Compose projects for homelab host **SALASROCK** (Ubuntu 26.04, Docker 29, ZFS, NVIDIA RTX 3060, Coral TPU). On the host this repo is `/nas/docker`. Each directory is one stack, `/nas/docker/<stack>`, with its own `docker-compose.yml` or `docker-compose.yaml`. Start `swag` first: that project creates the `shared-net` network the others join.
+Docker Compose projects for homelab host **ASROCK** (Ubuntu 26.04, Docker 29, ZFS, NVIDIA RTX 3060, Coral TPU). On the host this repo is `/nas/docker`. Each directory is one stack, `/nas/docker/<stack>`, with its own `docker-compose.yml` or `docker-compose.yaml`. Start `swag` first: that project creates the `shared-net` network the others join.
 
 ```text
 /nas/docker/<stack>/docker-compose.yml
@@ -14,7 +14,6 @@ Plex, Immich, Nextcloud, and PhotoSorter bind-mount media from other `/nas` data
 
 | Stack | Purpose | SWAG |
 | --- | --- | --- |
-| `baseballforward` | Baseball recruiting and members site (API, two UIs, Postgres) | Yes |
 | `healthchecks` | Cron and heartbeat monitoring | Yes |
 | `homeassistant` | Home Assistant, MQTT, Zigbee2MQTT, Z-Wave JS UI, ESPHome, code-server, Frigate | Yes |
 | `immich` | Photo and video library (server, CUDA ML, Valkey, Postgres) | Partial |
@@ -32,7 +31,6 @@ Plex, Immich, Nextcloud, and PhotoSorter bind-mount media from other `/nas` data
 | `salmeister` | Home website | Yes |
 | `scanner` | scanservjs web UI for a network scanner | Yes |
 | `scrapling` | Scrapling HTTP sidecar | Yes |
-| `selfdiscipline` | Self-discipline app (API, UI, Postgres) | Yes |
 | `signoz` | SigNoz, ClickHouse, and an OpenTelemetry collector | Yes |
 | `swag` | SWAG reverse proxy, Cloudflare tunnel, and the Docker socket proxy | — |
 | `transmission` | Transmission through OpenVPN | Yes |
@@ -90,7 +88,7 @@ ports:
   - "127.0.0.1:5984:5984"
 ```
 
-That pattern is used for CouchDB, Frigate's UI and internal API, code-server, the OpenClaw gateway, Baseball Forward Postgres, and the Mosquitto websocket. LAN-facing services publish on all interfaces (Plex, Omada discovery, WireGuard, MQTT `1883`, and others).
+That pattern is used for CouchDB, Frigate's UI and internal API, code-server, the OpenClaw gateway, and the Mosquitto websocket. LAN-facing services publish on all interfaces (Plex, Omada discovery, WireGuard, MQTT `1883`, and others).
 
 ## Conventions
 
