@@ -1,111 +1,121 @@
 services:
-  openclaw-gateway-andy:
-    image: ghcr.io/openclaw/openclaw:main
-    container_name: openclaw-andy
-    labels:
-      - swag=enable
-      - swag_address=${SWAG_ADDRESS}
-      - swag_port=18789
-      - swag_url=apa.*
-    environment:
-      TZ: America/Chicago
-      HOME: /home/node
-      TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      PATH: /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/bin:/bin
-      GOG_KEYRING_BACKEND: ${GOG_KEYRING_BACKEND}
-      GOG_KEYRING_PASSWORD: ${GOG_KEYRING_PASSWORD}
-      PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
-    networks:
-      - shared-net
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
-      - ./apa/config:/home/node/.config
-      - ./apa/openclaw:/home/node/.openclaw
-      - /nas/docker/obsidian/obsidian/config/Desktop/Andy:/home/node/shared/obsidian
-      - ./gateway-entrypoint.sh:/usr/local/bin/gateway-entrypoint.sh:ro 
-      - ./apa/.cache:/home/node/.cache
-    ports:
-      - "18789:18789"
-      - "18790:18790"
-    init: true
-    deploy:
-      resources:
-        limits:
-          memory: 16gb  # Cap to prevent overconsumption; adjust based on your Whisper model
-        reservations:
-          memory: 8gb   # Guarantee a minimum
-          devices:
-            - driver: nvidia
-              count: all  # Or specify device IDs if multiple GPUs
-              capabilities: [gpu]
-    restart: unless-stopped
-    user: "0:0" # Run the container as root user
-    command: ["/usr/local/bin/gateway-entrypoint.sh"]
+# openclaw-gateway-andy:
+#   image: ghcr.io/openclaw/openclaw:latest
+#   container_name: openclaw-andy
+#   labels:
+#     - swag=enable
+#     - swag_address=${SWAG_ADDRESS}
+#     - swag_port=18789
+#     - swag_url=apa.*
+#   environment:
+#     TZ: America/Chicago
+#     HOME: /home/node
+#     TERM: xterm-256color
+#     XDG_RUNTIME_DIR: /tmp/xdg-runtime
+#     OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+#     PATH: /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/bin:/bin
+#     GOG_KEYRING_BACKEND: ${GOG_KEYRING_BACKEND}
+#     GOG_KEYRING_PASSWORD: ${GOG_KEYRING_PASSWORD}
+#     PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
+#     OPENROUTER_API_KEY: ${OPENROUTER_API_KEY_ANDY}
+#     GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: /home/node/.openclaw/credentials/gws-credentials.json
+#     VAULTWARDEN_URL: ${VAULTWARDEN_URL}
+#     VAULTWARDEN_EMAIL: ${VAULTWARDEN_EMAIL_ANDY}
+#     VAULTWARDEN_MASTER_PASSWORD: ${VAULTWARDEN_MASTER_PASSWORD_ANDY}
+#   networks:
+#     - shared-net
+#   volumes:
+#     - /etc/localtime:/etc/localtime:ro
+#     - /etc/timezone:/etc/timezone:ro
+#     - ./homebrew:/home/linuxbrew/.linuxbrew:rw
+#     - ./apa/config:/home/node/.config
+#     - ./apa/openclaw:/home/node/.openclaw
+#     - /nas/docker/obsidian/obsidian/config/Desktop/Andy:/home/node/shared/obsidian
+#     - ./gateway-entrypoint.sh:/usr/local/bin/gateway-entrypoint.sh:ro
+#     - ./apa/.cache:/home/node/.cache
+#   ports:
+#     - "18789:18789"
+#     - "18790:18790"
+#   init: true
+#   deploy:
+#    resources:
+#      limits:
+#        memory: 16gb
+#      reservations:
+#        devices:
+#          - driver: nvidia
+#            count: all
+#            capabilities: [gpu]
+#   restart: unless-stopped
+#   user: "0:0"
+#   entrypoint: ["/usr/local/bin/gateway-entrypoint.sh"]
 
-  openclaw-cli-andy:
-    image: ghcr.io/openclaw/openclaw:latest
-    container_name: openclaw-cli-andy
-    environment:
-      HOME: /home/node
-      TERM: xterm-256color
-      BROWSER: echo
-    networks:
-      - shared-net
-    volumes:
-      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
-      - ./apa/config:/home/node/.config
-      - ./apa/openclaw:/home/node/.openclaw
-    stdin_open: true
-    tty: true
-    init: true
-    user: "0:0" # Run the container as root user
-    entrypoint: ["node", "dist/index.js"]
+#  openclaw-cli-andy:
+#   image: ghcr.io/openclaw/openclaw:latest
+#   container_name: openclaw-cli-andy
+#   environment:
+#     HOME: /home/node
+#     TERM: xterm-256color
+#     BROWSER: echo
+#   networks:
+#     - shared-net
+#   volumes:
+#     - ./homebrew:/home/linuxbrew/.linuxbrew:rw
+#     - ./apa/config:/home/node/.config
+#     - ./apa/openclaw:/home/node/.openclaw
+#   stdin_open: true
+#   tty: true
+#   init: true
+#   user: "0:0"
+#   entrypoint: ["node", "dist/index.js"]
 
-  openclaw-gateway-katie:
-    image: ghcr.io/openclaw/openclaw:latest
-    container_name: openclaw-katie
-    labels:
-      - swag=enable
-      - swag_address=${SWAG_ADDRESS}
-      - swag_port=18791
-      - swag_url=kpa.*
-    environment:
-      TZ: America/Chicago
-      HOME: /home/node
-      TERM: xterm-256color
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      PATH: /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/bin:/bin
-      GOG_KEYRING_BACKEND: ${GOG_KEYRING_BACKEND}
-      GOG_KEYRING_PASSWORD: ${GOG_KEYRING_PASSWORD}
-      PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
-    networks:
-      - shared-net
-    volumes:
-      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
-      - ./kpa/config:/home/node/.config
-      - ./kpa/openclaw:/home/node/.openclaw
-      - ./gateway-entrypoint.sh:/usr/local/bin/gateway-entrypoint.sh:ro 
-      - ./kpa/.cache:/home/node/.cache
-    ports:
-      - "18791:18789"
-      - "18792:18790"
-    init: true
-    deploy:
-      resources:
-        limits:
-          memory: 16gb  # Cap to prevent overconsumption; adjust based on your Whisper model
-        reservations:
-          memory: 8gb   # Guarantee a minimum
-          devices:
-            - driver: nvidia
-              count: all  # Or specify device IDs if multiple GPUs
-              capabilities: [gpu]
-    restart: unless-stopped
-    user: "0:0" # Run the container as root user
-    command: ["/usr/local/bin/gateway-entrypoint.sh"] 
+#  openclaw-gateway-katie:
+#    image: ghcr.io/openclaw/openclaw:latest
+#    container_name: openclaw-katie
+#    labels:
+#      - swag=enable
+#      - swag_address=${SWAG_ADDRESS}
+#      - swag_port=18791
+#      - swag_url=kpa.*
+#    environment:
+#      TZ: America/Chicago
+#      HOME: /home/node
+#      TERM: xterm-256color
+#      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+#      PATH: /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/bin:/bin
+#      GOG_KEYRING_BACKEND: ${GOG_KEYRING_BACKEND}
+#      GOG_KEYRING_PASSWORD: ${GOG_KEYRING_PASSWORD}
+#      PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
+#      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY_KATIE}
+#      GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: /home/node/.openclaw/credentials/gws-credentials.json
+#      VAULTWARDEN_URL: ${VAULTWARDEN_URL}
+#      VAULTWARDEN_EMAIL: ${VAULTWARDEN_EMAIL_KATIE}
+#      VAULTWARDEN_MASTER_PASSWORD: ${VAULTWARDEN_MASTER_PASSWORD_KATIE}
+#    networks:
+#      - shared-net
+#    volumes:
+#      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
+#      - ./kpa/config:/home/node/.config
+#      - ./kpa/openclaw:/home/node/.openclaw
+#      - ./gateway-entrypoint.sh:/usr/local/bin/gateway-entrypoint.sh:ro 
+#      - ./kpa/.cache:/home/node/.cache
+#    ports:
+#      - "18791:18789"
+#      - "18792:18790"
+#    init: true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 16gb  # Cap to prevent overconsumption; adjust based on your Whisper model
+#        reservations:
+#          memory: 8gb   # Guarantee a minimum
+#          devices:
+#            - driver: nvidia
+#              count: all  # Or specify device IDs if multiple GPUs
+#              capabilities: [gpu]
+#    restart: unless-stopped
+#    user: "0:0" # Run the container as root user
+#    command: ["/usr/local/bin/gateway-entrypoint.sh"] 
 
   openclaw-gateway-bf:
     image: ghcr.io/openclaw/openclaw:latest
@@ -124,6 +134,14 @@ services:
       GOG_KEYRING_BACKEND: ${GOG_KEYRING_BACKEND}
       GOG_KEYRING_PASSWORD: ${GOG_KEYRING_PASSWORD}
       PLAYWRIGHT_BROWSERS_PATH: /home/node/.cache/ms-playwright
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY_BF}
+      GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: /home/node/.openclaw/credentials/gws-credentials.json
+      VAULTWARDEN_URL: ${VAULTWARDEN_URL}
+      VAULTWARDEN_EMAIL: ${VAULTWARDEN_EMAIL_BF}
+      VAULTWARDEN_MASTER_PASSWORD: ${VAULTWARDEN_MASTER_PASSWORD_BF}
+      BRAVE_API_KEY: ${BRAVE_API_KEY_BF}
+      TAVILY_API_KEY: ${TAVILY_API_KEY_BF}
+      FIRECRAWL_API_KEY: $FIRECRAWL_API_KEY_BF}
     networks:
       - shared-net
     volumes:
@@ -136,16 +154,16 @@ services:
       - "18793:18789"
       - "18794:18790"
     init: true
-    deploy:
-      resources:
-        limits:
-          memory: 16gb  # Cap to prevent overconsumption; adjust based on your Whisper model
-        reservations:
-          memory: 8gb   # Guarantee a minimum
-          devices:
-            - driver: nvidia
-              count: all  # Or specify device IDs if multiple GPUs
-              capabilities: [gpu]
+   #deploy:
+     #resources:
+      #  limits:
+      #    memory: 16gb  # Cap to prevent overconsumption; adjust based on your Whisper model
+      #  reservations:
+      #    memory: 8gb   # Guarantee a minimum
+      #   devices:
+      #      - driver: nvidia
+      #        count: all  # Or specify device IDs if multiple GPUs
+      #       capabilities: [gpu]
     restart: unless-stopped
     user: "0:0" # Run the container as root user
     command: ["/usr/local/bin/gateway-entrypoint.sh"]
@@ -169,24 +187,24 @@ services:
     user: "0:0" # Run the container as root user
     entrypoint: ["node", "dist/index.js"]
 
-  openclaw-cli-katie:
-    image: ghcr.io/openclaw/openclaw:latest
-    container_name: openclaw-cli-katie
-    environment:
-      HOME: /home/node
-      TERM: xterm-256color
-      BROWSER: echo
-    networks:
-      - shared-net
-    volumes:
-      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
-      - ./kpa/config:/home/node/.config
-      - ./kpa/openclaw:/home/node/.openclaw
-    stdin_open: true
-    tty: true
-    init: true
-    user: "0:0" # Run the container as root user
-    entrypoint: ["node", "dist/index.js"]
+#  openclaw-cli-katie:
+#    image: ghcr.io/openclaw/openclaw:latest
+#    container_name: openclaw-cli-katie
+#    environment:
+#      HOME: /home/node
+#      TERM: xterm-256color
+#      BROWSER: echo
+#    networks:
+#      - shared-net
+#    volumes:
+#      - ./homebrew:/home/linuxbrew/.linuxbrew:rw
+#      - ./kpa/config:/home/node/.config
+#      - ./kpa/openclaw:/home/node/.openclaw
+#    stdin_open: true
+#    tty: true
+#    init: true
+#    user: "0:0" # Run the container as root user
+#    entrypoint: ["node", "dist/index.js"]
 
 networks:
   shared-net:

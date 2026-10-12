@@ -18,13 +18,12 @@ services:
       - TZ=America/Chicago
       - PUID=1000
       - PGID=1002
-      - PLEX_CLAIM=/run/secrets/plex_claim
+      - FILE__PLEX_CLAIM=/run/secrets/plex_claim
       - NVIDIA_VISIBLE_DEVICES=all
     secrets:
       - plex_claim
     volumes:
       - ./config:/config
-      - /etc/resolv.conf:/etc/resolv.conf
       - ./transcode/temp:/transcode
       - /nas/tv_content/TV_Shows:/tv_shows
       - /nas/tv_content/Movies:/movies

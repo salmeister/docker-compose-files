@@ -9,7 +9,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - database_data:/var/lib/postgresql/data
+      - database_data:/var/lib/postgresql
     networks:
       - shared-net
     restart: unless-stopped
@@ -31,11 +31,18 @@ services:
       - StripeSettings__SecretKey=${STRIPE_SECRET_KEY}
       - StripeSettings__PublishableKey=${STRIPE_PUBLISHABLE_KEY}
       - StripeSettings__WebhookSecret=${WEBHOOK_SECRET}
-      - StripeSettings__BasicProductId=${BASIC_PRODUCT_ID}
-      - StripeSettings__StandardProductId=${STANDARD_PRODUCT_ID}
-      - StripeSettings__MembersProductId=${MEMBERS_PRODUCT_ID}
-      - StripeSettings__MembersMonthlyPriceId=${MEMBERS_MONTHLY_PRICE_ID}
-      - StripeSettings__MembersAnnualPriceId=${MEMBERS_ANNUAL_PRICE_ID}
+      - StripeSettings__BasicProductId=${STRIPE_BASIC_PRODUCT_ID}
+      - StripeSettings__StandardProductId=${STRIPE_STANDARD_PRODUCT_ID}
+      - StripeSettings__PremiumProductId=${STRIPE_PREMIUM_PRODUCT_ID}
+      - StripeSettings__BasicToStandardUpgradePriceId=${STRIPE_BASIC_TO_STANDARD_UPGRADE_PRICE_ID}
+      - StripeSettings__BasicToPremiumUpgradePriceId=${STRIPE_BASIC_TO_PREMIUM_UPGRADE_PRICE_ID}
+      - StripeSettings__StandardToPremiumUpgradePriceId=${STRIPE_STANDARD_TO_PREMIUM_UPGRADE_PRICE_ID}
+      - StripeSettings__MembersProductId=${STRIPE_MEMBERS_PRODUCT_ID}
+      - StripeSettings__MembersMonthlyPriceId=${STRIPE_MEMBERS_MONTHLY_PRICE_ID}
+      - StripeSettings__MembersAnnualPriceId=${STRIPE_MEMBERS_ANNUAL_PRICE_ID}
+      - StripeSettings__EntryProductId=${STRIPE_ENTRY_PRODUCT_ID}
+      - StripeSettings__EntryMonthlyPriceId=${STRIPE_ENTRY_MONTHLY_PRICE_ID}
+      - StripeSettings__EntryAnnualPriceId=${STRIPE_ENTRY_ANNUAL_PRICE_ID}
       - DigitalOceanSpaces__AccessKey=${DOS_ACCESS_KEY}
       - DigitalOceanSpaces__SecretKey=${DOS_SECRET_KEY}
       - DigitalOceanSpaces__BucketName=${DOS_BUCKET_NAME}

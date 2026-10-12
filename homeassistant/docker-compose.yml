@@ -161,10 +161,10 @@ services:
     container_name: frigate
     privileged: true # this may not be necessary for all setups
     restart: unless-stopped
-    image: ghcr.io/blakeblackshear/frigate:0.17.0
+    image: ghcr.io/blakeblackshear/frigate:0.18.0
     networks:
       - shared-net
-    shm_size: "264mb"
+    shm_size: "328mb"
     deploy:
       resources:
         reservations:
@@ -210,7 +210,9 @@ services:
       - PUID=1000
       - PGID=1002
       - TZ=America/Chicago
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GIT_CONFIG_COUNT=1
+      - GIT_CONFIG_KEY_0=safe.directory
+      - GIT_CONFIG_VALUE_0=/config
     volumes:
       - /run/dbus:/run/dbus:ro
       - ./ha/config:/config
