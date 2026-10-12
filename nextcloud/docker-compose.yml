@@ -1,6 +1,6 @@
 services:
   nextcloud:
-    image: nextcloud
+    image: nextcloud:35.0.1-apache
     container_name: nextcloud
     networks:
       - shared-net
@@ -12,7 +12,7 @@ services:
       - swag_url=nextcloud.*
       - com.centurylinklabs.watchtower.enable=false
     environment:
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
       - REDIS_HOST=nextcloud-redis
       - REDIS_PORT=6379
       - REDIS_HOST_PASSWORD=${REDIS_PSSWD}
@@ -28,13 +28,13 @@ services:
       - ./data:/var/www/html/data
       - /nas/home_content/Media-Import:/mnt/Media-Import
     depends_on:
-     # nextcloud-db:
-     #   condition: service_healthy
+      nextcloud-db:
+        condition: service_healthy
       nextcloud-redis:
         condition: service_healthy
     restart: unless-stopped
   nextcloud-db:
-    image: mariadb
+    image: mariadb # verify current major before pulling
     container_name: nextcloud-db
     networks:
       - shared-net
@@ -43,20 +43,22 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PSSWD}
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=ncuser
       - MYSQL_PASSWORD=${DB_PSSWD}
       - MARIADB_AUTO_UPGRADE=1
     volumes:
       - ./db:/var/lib/mysql
-    #healthcheck:
-      #test: ["CMD", "/usr/local/bin/healthcheck.sh" ,"--su-mysql", "--connect", "--innodb_initialized"]
-      #timeout: 20s
-      #retries: 10
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
   nextcloud-redis:
-    image: redis
+    image: redis # verify current major before pulling
     container_name: nextcloud-redis
     networks:
       - shared-net
@@ -64,11 +66,13 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PSSWD}
+    environment:
+      - REDISCLI_AUTH=${REDIS_PSSWD}
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 30
+      retries: 5
 networks:
   shared-net:
     external: true

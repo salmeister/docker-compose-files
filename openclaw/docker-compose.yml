@@ -8,7 +8,7 @@ services:
 #     - swag_port=18789
 #     - swag_url=apa.*
 #   environment:
-#     TZ: America/Chicago
+#     TZ: ${TZ:-America/Chicago}
 #     HOME: /home/node
 #     TERM: xterm-256color
 #     XDG_RUNTIME_DIR: /tmp/xdg-runtime
@@ -78,7 +78,7 @@ services:
 #      - swag_port=18791
 #      - swag_url=kpa.*
 #    environment:
-#      TZ: America/Chicago
+#      TZ: ${TZ:-America/Chicago}
 #      HOME: /home/node
 #      TERM: xterm-256color
 #      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
@@ -122,11 +122,11 @@ services:
     container_name: openclaw-bf
     labels:
       - swag=enable
-      - swag_address=${SWAG_ADDRESS}
-      - swag_port=18793
+      - swag_address=openclaw-bf
+      - swag_port=18789
       - swag_url=bfpa.*
     environment:
-      TZ: America/Chicago
+      TZ: ${TZ:-America/Chicago}
       HOME: /home/node
       TERM: xterm-256color
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
@@ -151,8 +151,8 @@ services:
       - ./gateway-entrypoint.sh:/usr/local/bin/gateway-entrypoint.sh:ro
       - ./bfpa/.cache:/home/node/.cache
     ports:
-      - "18793:18789"
-      - "18794:18790"
+      - "127.0.0.1:18793:18789"
+      - "127.0.0.1:18794:18790"
     init: true
    #deploy:
      #resources:
@@ -184,6 +184,7 @@ services:
     stdin_open: true
     tty: true
     init: true
+    restart: unless-stopped
     user: "0:0" # Run the container as root user
     entrypoint: ["node", "dist/index.js"]
 

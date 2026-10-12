@@ -15,6 +15,12 @@
 !/*/docker-compose.yaml
 !/*/*.sh
 !/*/README.md
+!/*/.env.example
+
+# CI and local secret scanning (still default-deny everywhere else)
+!.github/
+!.github/**
+!.pre-commit-config.yaml
 
 # Explicit exclusions (override the README.md unignore above)
 /bfbackups/*

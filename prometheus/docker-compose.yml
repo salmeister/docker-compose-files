@@ -40,7 +40,7 @@ services:
     image: nvidia/dcgm-exporter:latest
     container_name: nvidia_dcgm_exporter
     cap_add:
-      - SYS_ADMIN
+      - SYS_ADMIN # required for DCGM profiling metrics (DCGM_FI_PROF_*); NVIDIA docs still list it
     deploy:
       resources:
         reservations:
@@ -52,11 +52,6 @@ services:
     #  - DCGM_EXPORTER_COLLECTORS=/etc/dcgm-exporter/custom-dcgm-metrics.csv
     #volumes:
     #  - ./dcgm-exporter:/etc/dcgm-exporter
-    devices:
-      - /dev/nvidiactl:/dev/nvidiactl
-      - /dev/nvidia-uvm:/dev/nvidia-uvm
-      - /dev/nvidia-modeset:/dev/nvidia-modeset
-      - /dev/nvidia0:/dev/nvidia0 # Add all the GPUs you have
     ports:
       - '9400:9400'
     restart: unless-stopped

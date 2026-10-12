@@ -1,6 +1,6 @@
 services:
   signoz:
-    image: signoz/signoz:latest
+    image: signoz/signoz:v0.145.0
     container_name: signoz
     restart: unless-stopped
     depends_on:
@@ -60,7 +60,7 @@ services:
       - shared-net
 
   schema-migrator-sync:
-    image: signoz/signoz-schema-migrator:latest
+    image: signoz/signoz-schema-migrator:v0.144.13
     container_name: schema-migrator-sync
     restart: on-failure
     depends_on:
@@ -73,7 +73,7 @@ services:
       - shared-net
 
   signoz-otel-collector:
-    image: signoz/signoz-otel-collector:latest
+    image: signoz/signoz-otel-collector:v0.144.13
     container_name: signoz-otel-collector
     restart: unless-stopped
     depends_on:

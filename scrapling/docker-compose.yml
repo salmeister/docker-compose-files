@@ -5,7 +5,7 @@ services:
     networks:
       - shared-net
     environment:
-      - TZ=America/Chicago
+      - TZ=${TZ:-America/Chicago}
       - PORT=8080
       - SCRAPLING_SIDECAR_TOKEN=${SCRAPLING_SIDECAR_TOKEN}
     ports:

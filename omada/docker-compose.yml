@@ -2,6 +2,7 @@ services:
    omada:
      container_name: omada
      image: mbentley/omada-controller:latest
+     restart: unless-stopped
      env_file:
        - ./.env
      ports:
