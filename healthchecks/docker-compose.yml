@@ -5,9 +5,9 @@ services:
     networks:
       - shared-net
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - SITE_ROOT=${SITE_ROOT}
       - SITE_NAME='Health Checks'
       - ALLOWED_HOSTS=*

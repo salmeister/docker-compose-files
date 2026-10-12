@@ -12,9 +12,9 @@ services:
     ports:
       - 9925:9000
     environment:
-      - PUID=1000
-      - PGID=1002
-      - TZ=America/Chicago
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1002}
+      - TZ=${TZ:-America/Chicago}
       - ALLOW_SIGNUP=false
       - RECIPE_PUBLIC=false
       - MAX_WORKERS=1
