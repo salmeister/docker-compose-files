@@ -199,7 +199,7 @@ services:
 
   homeassistant:
     container_name: homeassistant
-    image: lscr.io/linuxserver/homeassistant:2026.10.1
+    image: lscr.io/linuxserver/homeassistant:latest
 #    depends_on:
 #      postgresdb:
 #        condition: service_healthy

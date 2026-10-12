@@ -36,9 +36,17 @@ jobs:
           import pathlib, re, subprocess, sys
 
           root = pathlib.Path(".").resolve()
-          composes = sorted(list(root.glob("*/docker-compose.yml")) + list(root.glob("*/docker-compose.yaml")))
+          # Personal stacks are kept on the host and are not part of this repo.
+          skip = {"baseballforward", "selfdiscipline"}
+          composes = [
+              path
+              for path in sorted(list(root.glob("*/docker-compose.yml")) + list(root.glob("*/docker-compose.yaml")))
+              if path.parent.name not in skip
+          ]
 
           for example in root.glob("*/.env.example"):
+              if example.parent.name in skip:
+                  continue
               target = example.with_name(".env")
               if not target.exists():
                   target.write_text(example.read_text())

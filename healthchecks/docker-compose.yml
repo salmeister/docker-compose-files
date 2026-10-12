@@ -24,7 +24,6 @@ services:
       - ./config:/config
     ports:
       - 8777:8000
-      - 2525:2525 #optional
     restart: unless-stopped
     labels:
       - swag=enable
