@@ -34,7 +34,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
   nextcloud-db:
-    image: mariadb # verify current major before pulling
+    image: mariadb:12.3
     container_name: nextcloud-db
     networks:
       - shared-net
