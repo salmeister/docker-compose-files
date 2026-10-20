@@ -1,0 +1,40 @@
+services:
+  chatterbox:
+    build:
+      context: ./src
+      dockerfile: docker/Dockerfile.gpu
+    image: chatterbox-tts-api:a5f4661
+    container_name: chatterbox
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - HOST=${TS_IP}
+      - PORT=4123
+      - DEVICE=cuda
+      - USE_MULTILINGUAL_MODEL=false
+      - EXAGGERATION=0.5
+      - CFG_WEIGHT=0.5
+      - TEMPERATURE=0.8
+      - MODEL_CACHE_DIR=/cache
+      - VOICE_LIBRARY_DIR=/voices
+      - LONG_TEXT_DATA_DIR=/data/long_text_jobs
+      - VOICE_SAMPLE_PATH=/app/voice-sample.mp3
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ./models:/cache
+      - ./voices:/voices
+      - ./data:/data/long_text_jobs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${TS_IP}:4123/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 300s
