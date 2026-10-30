@@ -161,7 +161,7 @@ services:
     container_name: frigate
     # revert to privileged if Coral/GPU detection fails
     restart: unless-stopped
-    image: ghcr.io/blakeblackshear/frigate:0.18.0
+    image: ghcr.io/blakeblackshear/frigate:0.18.2
     networks:
       - shared-net
     shm_size: "328mb"

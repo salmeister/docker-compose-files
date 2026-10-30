@@ -1,28 +1,61 @@
+name: transmission
+
 services:
-  transmission-openvpn:
-    image: haugene/transmission-openvpn
+  transmission-vpn:
+    image: qmcgaw/gluetun:v3
     container_name: transmission-vpn
+    hostname: transmission-vpn
     networks:
       - shared-net
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun
-    restart: always
+    restart: unless-stopped
     ports:
-      - "9091:9091" # Transmission Web UI port
+      - "9091:9091" # Transmission web UI (served through the VPN container)
     volumes:
-      - ./openvpn-configs:/etc/openvpn/custom/
-      - ./data:/data
-      - /etc/localtime:/etc/localtime:ro
+      - ./openvpn-configs:/gluetun/custom:ro
+      - ./gluetun:/gluetun
     env_file:
       - ./.env
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=openvpn
+      - OPENVPN_CUSTOM_CONFIG=${OPENVPN_CUSTOM_CONFIG}
+      - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS}
+      - TZ=America/Chicago
     labels:
       - swag=enable
       - swag_port=9091
       - swag_url=transmission.*
+      - org.opencontainers.image.description=VPN tunnel (BOXPN) for transmission-app, with kill switch
+      - homelab.stack=transmission
+      - homelab.role=vpn
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+
+  transmission-app:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission-app
+    network_mode: "service:transmission-vpn"
+    depends_on:
+      transmission-vpn:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+      - ./data:/downloads
     environment:
-      - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60 # Additional options for VPN connection
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    labels:
+      - org.opencontainers.image.description=Transmission torrent client, all traffic forced through transmission-vpn
+      - homelab.stack=transmission
+      - homelab.role=app
     logging:
       driver: json-file
       options:

@@ -28,6 +28,7 @@ services:
       - ${DOMAIN_NAME}:127.0.0.1
     ports:
       - 81:81
+      - 443:443
     restart: unless-stopped
     networks:
       - shared-net

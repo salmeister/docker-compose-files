@@ -1,0 +1,21 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+    labels:
+      - swag=enable
+      - swag_url=adguard.${DOMAIN}
+      - "com.salmeister.description=LAN DNS with split-DNS rewrites for *.${DOMAIN}"
+    ports:
+      - ${HOST_LAN_IP}:53:53/tcp
+      - ${HOST_LAN_IP}:53:53/udp
+      - ${HOST_LAN_IP}:${ADGUARD_UI_PORT}:3000/tcp   # admin UI, LAN only
+    networks:
+      - shared-net
+    volumes:
+      - ./work:/opt/adguardhome/work
+      - ./conf:/opt/adguardhome/conf
+networks:
+  shared-net:
+    external: true
