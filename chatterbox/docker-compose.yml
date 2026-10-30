@@ -1,3 +1,8 @@
+# Build source is not tracked (gitignored). Before first build:
+#   git clone https://github.com/travisvn/chatterbox-tts-api src
+#   git -C src checkout a5f4661
+# Requires .env with TS_IP=<tailscale ip> (gitignored). Tailnet-only; never expose publicly.
+# ./voices, ./models, ./data are local only; never commit voice clips.
 services:
   chatterbox:
     build:

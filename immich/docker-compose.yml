@@ -15,6 +15,7 @@ services:
     labels:
       - swag=enable
       - swag_url=photos.*
+      - swag_server_custom_directive=proxy_request_buffering off; proxy_read_timeout 600s; proxy_send_timeout 600s;
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro

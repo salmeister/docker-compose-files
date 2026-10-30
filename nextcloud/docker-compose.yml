@@ -11,6 +11,7 @@ services:
       - swag_proto=http
       - swag_url=nextcloud.*
       - com.centurylinklabs.watchtower.enable=false
+      - swag_server_custom_directive=proxy_request_buffering off; proxy_read_timeout 600s; proxy_send_timeout 600s;
     environment:
       - TZ=${TZ:-America/Chicago}
       - REDIS_HOST=nextcloud-redis
@@ -20,6 +21,8 @@ services:
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PSSWD}
       - MYSQL_HOST=nextcloud-db
+      - PHP_UPLOAD_LIMIT=16G
+      - PHP_MEMORY_LIMIT=1G
     ports:
       - 8444:80
     volumes:
