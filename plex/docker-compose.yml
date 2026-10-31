@@ -20,6 +20,7 @@ services:
       - PGID=${PGID:-1002}
       - FILE__PLEX_CLAIM=/run/secrets/plex_claim
       - NVIDIA_VISIBLE_DEVICES=all
+      - ADVERTISE_IP=http://${LOCAL_IP}:32400/,https://plex.${DOMAIN}:443
     secrets:
       - plex_claim
     volumes:
